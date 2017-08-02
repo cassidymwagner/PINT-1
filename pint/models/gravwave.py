@@ -178,7 +178,7 @@ class GravWave(GravitationalWaveComponent):
         rcross_p = alpha_p * (-At_p*sin2psi + Bt_p*cos2psi)
         # residuals
         if psrTerm:
-            ress = fplus*(rplus_p-rplus)+fcross*(rcross_p-rcross)
+            res = fplus*(rplus_p-rplus)+fcross*(rcross_p-rcross)
         else:
-            ress = -fplus*rplus - fcross*rcross # don't need to add this to add to residuals already
-        return ress 
+            res = -fplus*rplus - fcross*rcross # don't need to add this to add to residuals already
+        return res 
