@@ -162,6 +162,13 @@ class TimingModel(object):
         return dfs
 
     @property
+    def grav_funcs(self,):
+        gfs = []
+        for g in self.GravitationalWaveComponent_list:
+            gfs += g.grav_funcs_component
+        return gfs
+
+    @property
     def phase_funcs(self,):
         pfs = []
         for p in self.PhaseComponent_list:
@@ -980,6 +987,10 @@ class PhaseComponent(Component):
         self.phase_funcs_component = []
         self.phase_derivs_wrt_delay = []
 
+class GravitationalWaveComponent(Component):
+    def __init__(self,):
+        super(GravitationalWaveComponent, self).__init__()
+        self.grav_funcs_component = []
 
 class TimingModelError(Exception):
     """Generic base class for timing model errors."""
