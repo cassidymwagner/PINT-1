@@ -11,7 +11,6 @@ import astropy.constants as c
 import pint as p 
 
 
-
 class GravWave(GravitationalWaveComponent):
     """This is a class to implement gravitational waves
     """
@@ -112,11 +111,9 @@ class GravWave(GravitationalWaveComponent):
             ptheta = np.pi/2 - pint_model.DECJ.value 
             pphi = pint_model.RAJ.value
         elif 'ELONG' and 'ELAT' in pint_model.params:
-            fac = 180.0/np.pi
-            coords = ephem.Equatorial(ephem.Ecliptic(str(pint_model.ELONG.value*fac),
-                                        str(pint_model.ELAT.value*fac)))
-            ptheta = np.pi/2 - float(reprlib(coords.dec))
-            pphi = float(reprlib(coords.ra))
+            icrs_coords = pint_model.coords_as_ICRS()
+            ptheta = np.pi/2 - (icrs_coords.dec.to(u.rad)).value
+            pphi = (icrs_coords.ra.to(u.rad)).value
         # use definitions from Sesana et. al 2010 and Ellis et. al 2012
         phat = np.array([np.sin(ptheta)*np.cos(pphi),np.sin(ptheta)*np.sin(pphi),
                 np.cos(ptheta)])
