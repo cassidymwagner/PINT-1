@@ -118,7 +118,11 @@ class GravWave(GravitationalWaveComponent):
         phat = np.array([np.sin(ptheta)*np.cos(pphi),np.sin(ptheta)*np.sin(pphi),
                 np.cos(ptheta)])
         fplus = 0.5 * (np.dot(m, phat))**2 - np.dot(n, phat)**2 / (1+np.dot(omhat,phat))
+        plt.plot(fplus)
+        plt.show()
         fcross = (np.dot(m, phat)*np.dot(n, phat)) / (1+np.dot(omhat, phat))
+        plt.plot(fcross)
+        plt.show()
         cosMu = -np.dot(omhat, phat)
         # defining and calling in the toas
         gettoas = pint_toa.get_mjds()
