@@ -23,15 +23,6 @@ class GravWave(GravitationalWaveComponent):
         self.grav_funcs_component += [self.grav_wave,]
         self.category = 'grav_wave'
 
-    # def grav_wave(self):
-
-    #     """This is a test function to see how this implements into PINT.
-    #     """
-    #     print(self.CMASS.quantity)
-    #     CMASS = pint.Tsun / self.CMASS.quantity
-    #     print(CMASS)
-    #     print("Hey")
-
     def grav_wave(pint_toa, pint_model, gwtheta, gwphi, mc, dist, fgw, phase0, psi,
                 inc, pdist=1.0, pphase=None, psrTerm=True,
                 evolve=True, phase_approx=False, tref=0):
