@@ -80,22 +80,15 @@ class GravWave(GravitationalWaveComponent):
         Vector of induced residuals
         '''
         # convert units 
-        mc *= p.Tsun # chirp mass in solar mass -> seconds
-        dist *= (1*u.Mpc).to(p.ls) # distance to SMBHB in Mpc -> seconds
+        mc *= p.Tsun                # convert from solar masses to seconds
+        dist *= (1*u.Mpc).to(p.ls)  # convert from Mpc to seconds
+        
         # defining initial orbital frequency
         w0 = np.pi * fgw
         phase0 /= 2 # orbital phase
         w053 = w0**(-5/3)
-        # define variable for later use 
-        # cosgwtheta = np.cos(gwtheta)
-        # cosgwphi = np.cos(gwphi)
-        # singwtheta = np.sin(gwtheta)
-        # singwphi = np.sin(gwphi)
-        # sin2psi = np.sin(2*psi)
-        # cos2psi = np.cos(2*psi)
-        # incfac1 = 0.5*(3+np.cos(2*inc))
-        # incfac2 = 2*np.cos(inc)
 
+        # define variable for later use
         cosgwtheta, cosgwphi = np.cos(gwtheta), np.cos(gwphi)
         singwtheta, singwphi = np.sin(gwtheta), np.sin(gwphi)
         sin2psi, cos2psi = np.sin(2*psi), np.cos(2*psi)
@@ -105,14 +98,12 @@ class GravWave(GravitationalWaveComponent):
         m = np.array([singwphi, -cosgwphi, 0.0])
         n = np.array([-cosgwtheta*cosgwphi, -cosgwtheta*singwphi, singwtheta])
         omhat = np.array([-singwtheta*cosgwphi, -singwtheta*singwphi, -cosgwtheta])
+
         # various factors involving GW parameters
         fac1 = 256/5 * mc**(5/3) * w0**(8/3)
         fac2 = 1/32/mc**(5/3)
         fac3 = mc**(5/3)/dist
-        # in PINT m.DECJ.units is deg
-        # then m.DECJ.quantity.to(u.rad) puts it into rads 
-        # then change m to self - assuming this is going into a class
-        # pulsar location ## TODO this might not hold in PINT, ra and dec stuff? ---- double check the name of par file
+
         if 'RAJ' and 'DECJ' in pint_model.params: 
             ptheta = np.pi/2 - pint_model.DECJ.value 
             pphi = pint_model.RAJ.value
@@ -120,15 +111,19 @@ class GravWave(GravitationalWaveComponent):
             icrs_coords = pint_model.coords_as_ICRS()
             ptheta = np.pi/2 - (icrs_coords.dec.to(u.rad)).value
             pphi = (icrs_coords.ra.to(u.rad)).value
+        
         # use definitions from Sesana et. al 2010 and Ellis et. al 2012
         phat = np.array([np.sin(ptheta)*np.cos(pphi),np.sin(ptheta)*np.sin(pphi),
                 np.cos(ptheta)])
+        
         fplus = 0.5 * (np.dot(m, phat)**2 - np.dot(n, phat)**2) / (1+np.dot(omhat, phat))
         fcross = (np.dot(m, phat)*np.dot(n, phat)) / (1+np.dot(omhat, phat))
         cosMu = -np.dot(omhat, phat)
+        
         # defining and calling in the toas
         gettoas = pint_toa.get_mjds()
         gettoas = np.asarray(gettoas)
+        
         # get values from pulsar object 
         toas = np.double(gettoas)*86400 - tref 
         if pphase is not None:
@@ -136,19 +131,24 @@ class GravWave(GravitationalWaveComponent):
         else:
             pd = pdist
         # convert units 
-        pd *= ((1*u.kpc).to(u.s,equivalencies=p.light_second_equivalency)).value
+        pd *= ((1*u.kpc).to(u.s,equivalencies=p.light_second_equivalency)).value # convert from kpc to seconds
+        
         # get pulsar time
         tp = toas-pd*(1-cosMu)
+        
         # evolution
         if evolve:
             # calculate time dependent frequency at earth and pulsar
             omega = w0 * (1 - fac1.value * toas)**(-3/8)
             omega_p = w0 * (1 - fac1.value * tp)**(-3/8)
+
             # calculate time dependent phase
             phase = phase0 + fac2.value * (w053 - omega**(-5/3))
             phase_p = phase0 + fac2.value * (w053 - omega_p**(-5/3))
+
         # use approximation that frequency does not evolve over obs. time
         elif phase_approx:
+
             # frequencies
             omega = w0
             omega_p = w0 * (1 + fac1 * pd*(1-cosMu))**(-3/8)
@@ -173,6 +173,7 @@ class GravWave(GravitationalWaveComponent):
         Bt = np.cos(2*phase) * incfac2
         At_p = np.sin(2*phase_p) * incfac1
         Bt_p = np.cos(2*phase_p) * incfac2
+
         # now define time dependent amplitudes 
         alpha = fac3.value / omega**(1/3)
         alpha_p = fac3.value / omega_p**(1/3)
@@ -182,9 +183,10 @@ class GravWave(GravitationalWaveComponent):
         rcross = alpha * (-At*sin2psi + Bt*cos2psi)
         rplus_p = alpha_p * (At_p*cos2psi + Bt_p*sin2psi)
         rcross_p = alpha_p * (-At_p*sin2psi + Bt_p*cos2psi)
+
         # residuals
         if psrTerm:
             res = fplus*(rplus_p-rplus)+fcross*(rcross_p-rcross)
         else:
-            res = -fplus*rplus - fcross*rcross # don't need to add this to add to residuals already
+            res = -fplus*rplus - fcross*rcross
         return res 
