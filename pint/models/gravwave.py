@@ -79,22 +79,28 @@ class GravWave(GravitationalWaveComponent):
         -------
         Vector of induced residuals
         '''
-        # convert units ## TODO convert units again to work with astropy
+        # convert units 
         mc *= p.Tsun # chirp mass in solar mass -> seconds
         dist *= (1*u.Mpc).to(p.ls) # distance to SMBHB in Mpc -> seconds
         # defining initial orbital frequency
         w0 = np.pi * fgw
         phase0 /= 2 # orbital phase
         w053 = w0**(-5/3)
-        # define variable for later use - all trig values are in radians
-        cosgwtheta = np.cos(gwtheta)
-        cosgwphi = np.cos(gwphi)
-        singwtheta = np.sin(gwtheta)
-        singwphi = np.sin(gwphi)
-        sin2psi = np.sin(2*psi)
-        cos2psi = np.cos(2*psi)
-        incfac1 = 0.5*(3+np.cos(2*inc))
-        incfac2 = 2*np.cos(inc)
+        # define variable for later use 
+        # cosgwtheta = np.cos(gwtheta)
+        # cosgwphi = np.cos(gwphi)
+        # singwtheta = np.sin(gwtheta)
+        # singwphi = np.sin(gwphi)
+        # sin2psi = np.sin(2*psi)
+        # cos2psi = np.cos(2*psi)
+        # incfac1 = 0.5*(3+np.cos(2*inc))
+        # incfac2 = 2*np.cos(inc)
+
+        cosgwtheta, cosgwphi = np.cos(gwtheta), np.cos(gwphi)
+        singwtheta, singwphi = np.sin(gwtheta), np.sin(gwphi)
+        sin2psi, cos2psi = np.sin(2*psi), np.cos(2*psi)
+        incfac1, incfac2 = 0.5*(3+np.cos(2*inc)), 2*np.cos(inc)
+        
         # unit vectors to GW source 
         m = np.array([singwphi, -cosgwphi, 0.0])
         n = np.array([-cosgwtheta*cosgwphi, -cosgwtheta*singwphi, singwtheta])
