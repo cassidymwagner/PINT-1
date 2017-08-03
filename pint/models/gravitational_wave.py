@@ -28,44 +28,43 @@ class GravitationalWave(GravitationalWaveComponent):
                 evolve=True, phase_approx=False, tref=0):
         ''' 
         This function accepts a series of parameters for a continuous
-        gravitational wave and returns the timing residuals caused by 
+        gravitational wave and returns the timing residuals caused by
         said wave.
+
         The method of calculating the residuals is defined by Ellis et. al
-        2012; this code is modeled after the libstempo package written by 
-        Stephen Taylor (? and other people?)
-        
-        Will need to read in toas and .par file
-        Will have to change a lot of stuff to -> self.stuff (self.RAJ.quantity)
+        2012; this code is modeled after the libstempo package written by
+        Stephen Taylor.
+
         Parameters
         ----------
-        psr : libstempo class # want to change to pint model class
+        psr : PINT model class 
             Pulsar object
-        gwtheta : float # int?
-            Polar angle of GW source in celestial coordinates [units: radians]
-        gwphi : float # int?
-            Azimuthal angle of GW source in celestial coordinates [units: radians]
-        mc : float # ? do np.double for all floats
+        gwtheta : double
+            Polar angle of GW source in celestial coordinates [radians]
+        gwphi : double
+            Azimuthal angle of GW source in celestial coordinates [radians]
+        mc : double
             Chirp mass of SMBHB [solar masses]
-        dist : float # ?
+        dist : double
             Luminosity distance to SMBHB [Mpc]
-        fgw : float # ?
+        fgw : double
             GW frequency, twice the orbital frequency [Hz]
-        phase0 : float # ?
-            Iniitial phase of GW source [radians]
-        psi: float # ?
+        phase0 : double
+            Initial phase of GW source [radians]
+        psi: double
             Polarization of GW source [radians]
         inc : double
             Inclination of GW source [radians]
-        pdist : float # ?
+        pdist : double
             Pulsar distance to use other than those in psr [kpc]
-        pphase : float # ?
+        pphase : double
             Use pulsar phase to determine distance [radians]
         psrTerm : bool
             Option to include pulsar term [bool]
         evolve : bool
             Option to exclude evolution [bool]
-        tref : ?
-            Fiducial time at which initial parameters are referenced [?]
+        tref : double
+            Fiducial time at which initial parameters are referenced [sec]
         Returns
         -------
         Vector of induced residuals
