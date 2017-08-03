@@ -6,7 +6,7 @@ from .timing_model import TimingModel
 
 # Import all standard model components here
 from .astrometry import AstrometryEquatorial, AstrometryEcliptic
-from .gravwave import GravWave
+from .gravitational_wave import GravitationalWave
 from .binary_bt import BinaryBT
 from .binary_dd import BinaryDD
 from .binary_ell1 import BinaryELL1

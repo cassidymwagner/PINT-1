@@ -11,19 +11,19 @@ import astropy.constants as c
 import pint as p 
 
 
-class GravWave(GravitationalWaveComponent):
+class GravitationalWave(GravitationalWaveComponent):
     """This is a class to implement gravitational waves
     """
     register = True
     def __init__(self):
-        super(GravWave, self).__init__()
+        super(GravitationalWave, self).__init__()
         self.add_param(parameter.floatParameter(name = 'CMASS', units='solMass', 
             description="Chirp mass"))
         
-        self.grav_funcs_component += [self.grav_wave,]
-        self.category = 'grav_wave'
+        self.gw_funcs_component += [self.continuous_gw,]
+        self.category = 'continuous_gw'
 
-    def grav_wave(pint_toa, pint_model, gwtheta, gwphi, mc, dist, fgw, phase0, psi,
+    def continuous_gw(pint_toa, pint_model, gwtheta, gwphi, mc, dist, fgw, phase0, psi,
                 inc, pdist=1.0, pphase=None, psrTerm=True,
                 evolve=True, phase_approx=False, tref=0):
         ''' 
