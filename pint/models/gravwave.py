@@ -81,9 +81,7 @@ class GravWave(GravitationalWaveComponent):
         '''
         # convert units 
         mc *= p.Tsun # chirp mass in solar mass -> seconds
-        print("mc = ",mc)
         dist *= (1*u.Mpc).to(p.ls) # distance to SMBHB in Mpc -> seconds
-        print("dist = ",dist)
         # defining initial orbital frequency
         w0 = np.pi * fgw
         phase0 /= 2 # orbital phase
@@ -109,11 +107,8 @@ class GravWave(GravitationalWaveComponent):
         omhat = np.array([-singwtheta*cosgwphi, -singwtheta*singwphi, -cosgwtheta])
         # various factors involving GW parameters
         fac1 = 256/5 * mc**(5/3) * w0**(8/3)
-        print("fac1 = ",fac1)
         fac2 = 1/32/mc**(5/3)
-        print("fac2 = ",fac2)
         fac3 = mc**(5/3)/dist
-        print("fac3 = ",fac3)
         # in PINT m.DECJ.units is deg
         # then m.DECJ.quantity.to(u.rad) puts it into rads 
         # then change m to self - assuming this is going into a class
@@ -121,30 +116,19 @@ class GravWave(GravitationalWaveComponent):
         if 'RAJ' and 'DECJ' in pint_model.params: 
             ptheta = np.pi/2 - pint_model.DECJ.value 
             pphi = pint_model.RAJ.value
-            print("ptheta = ",ptheta)
-            print("pphi = ",pphi)
         elif 'ELONG' and 'ELAT' in pint_model.params:
             icrs_coords = pint_model.coords_as_ICRS()
             ptheta = np.pi/2 - (icrs_coords.dec.to(u.rad)).value
             pphi = (icrs_coords.ra.to(u.rad)).value
-            print("ptheta = ",ptheta)
-            print("pphi = ",pphi)
         # use definitions from Sesana et. al 2010 and Ellis et. al 2012
         phat = np.array([np.sin(ptheta)*np.cos(pphi),np.sin(ptheta)*np.sin(pphi),
                 np.cos(ptheta)])
-        print("phat = ",phat)
-
-        fplus = 0.5 * (np.dot(m, phat))**2 - np.dot(n, phat)**2 / (1+np.dot(omhat,phat))
+        fplus = 0.5 * (np.dot(m, phat)**2 - np.dot(n, phat)**2) / (1+np.dot(omhat, phat))
         fcross = (np.dot(m, phat)*np.dot(n, phat)) / (1+np.dot(omhat, phat))
         cosMu = -np.dot(omhat, phat)
-        print("fplus = ",fplus)
-        print("fcross = ",fcross)
-        print("cosMu = ",cosMu)
-
         # defining and calling in the toas
         gettoas = pint_toa.get_mjds()
         gettoas = np.asarray(gettoas)
-
         # get values from pulsar object 
         toas = np.double(gettoas)*86400 - tref 
         if pphase is not None:
@@ -153,24 +137,16 @@ class GravWave(GravitationalWaveComponent):
             pd = pdist
         # convert units 
         pd *= ((1*u.kpc).to(u.s,equivalencies=p.light_second_equivalency)).value
-        print("pd = ",pd)
-
         # get pulsar time
         tp = toas-pd*(1-cosMu)
-        print("tp = ",tp)
-
         # evolution
         if evolve:
             # calculate time dependent frequency at earth and pulsar
             omega = w0 * (1 - fac1.value * toas)**(-3/8)
             omega_p = w0 * (1 - fac1.value * tp)**(-3/8)
-
             # calculate time dependent phase
             phase = phase0 + fac2.value * (w053 - omega**(-5/3))
             phase_p = phase0 + fac2.value * (w053 - omega_p**(-5/3))
-
-
-
         # use approximation that frequency does not evolve over obs. time
         elif phase_approx:
             # frequencies
@@ -192,39 +168,20 @@ class GravWave(GravitationalWaveComponent):
             phase = phase0 + omega * toas
             phase_p = phase0 + omega * tp
             
-        print("omega = ",omega)
-        print("omega_p = ",omega_p)
-        print("phase = ",phase)
-        print("phase_p = ",phase_p)            
         # define time dependent coefficients
         At = np.sin(2*phase) * incfac1
         Bt = np.cos(2*phase) * incfac2
         At_p = np.sin(2*phase_p) * incfac1
         Bt_p = np.cos(2*phase_p) * incfac2
-
-        print("At = ",At)
-        print("Bt = ",Bt)
-        print("At_p",At_p)
-        print("Bt_p",Bt_p)
-
         # now define time dependent amplitudes 
         alpha = fac3.value / omega**(1/3)
         alpha_p = fac3.value / omega_p**(1/3)
-
-        print("alpha = ",alpha)
-        print("alpha_p = ",alpha_p)
 
         # define rplus and rcross
         rplus = alpha * (At*cos2psi + Bt*sin2psi)
         rcross = alpha * (-At*sin2psi + Bt*cos2psi)
         rplus_p = alpha_p * (At_p*cos2psi + Bt_p*sin2psi)
         rcross_p = alpha_p * (-At_p*sin2psi + Bt_p*cos2psi)
-
-        print("rplus = ",rplus)
-        print("rcross = ",rcross)
-        print("rplus_p = ",rplus_p)
-        print("rcross_p = ",rcross_p)
-
         # residuals
         if psrTerm:
             res = fplus*(rplus_p-rplus)+fcross*(rcross_p-rcross)
